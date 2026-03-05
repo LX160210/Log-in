@@ -1,0 +1,168 @@
+body {
+    font-family: "微软雅黑", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+    color: #222;
+}
+
+header {
+    background: #0057b8;
+    color: #fff;
+    padding: 10px 0;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+main {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+footer {
+    text-align: center;
+    padding: 20px 0;
+    background: #eee;
+    color: #2758b3;
+    position: fixed;
+    left: 0;
+    width: 100%;
+    bottom: 0;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.panel {
+    margin-top: 22px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 18px;
+}
+
+.hidden {
+    display: none;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 10px 12px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.form-grid.compact {
+    max-width: 600px;
+}
+
+.form-grid input,
+.form-grid button {
+    padding: 8px 10px;
+    border: 1px solid #d2d2d2;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-grid button {
+    width: fit-content;
+    background: #0057b8;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+.form-grid button:hover {
+    background: #084aa0;
+}
+
+.inline-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.inline-actions button {
+    border: 1px solid #bfcff0;
+    background: #f5f8ff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header button {
+    border: 1px solid #d8d8d8;
+    background: #fff;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.message {
+    color: #0d3f8f;
+    min-height: 20px;
+    margin: 12px 0 0;
+}
+
+.hint {
+    color: #666;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    border: 1px solid #e8e8e8;
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+thead {
+    background: #f3f6fc;
+}
+
+@media (max-width: 720px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

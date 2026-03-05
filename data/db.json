@@ -1,0 +1,96 @@
+{
+  "employees": {
+    "E1001": {
+      "employeeId": "E1001",
+      "password": "111111",
+      "profile": {
+        "phone": "123456789",
+        "email": "e1001@company.com",
+        "department": "技术部",
+        "position": "开发工程师"
+      },
+      "security": {
+        "failedAttempts": 0,
+        "lockedUntil": 0
+      },
+      "recovery": {
+        "method": "email",
+        "code": "",
+        "expiresAt": 0
+      },
+      "history": [
+        {
+          "time": "2026/3/4 19:11:48",
+          "field": "手机号",
+          "oldValue": "13800000000",
+          "newValue": "123456789"
+        }
+      ]
+    },
+    "E2001": {
+      "employeeId": "E2001",
+      "password": "123456",
+      "profile": {
+        "phone": "",
+        "email": "",
+        "department": "",
+        "position": ""
+      },
+      "security": {
+        "failedAttempts": 0,
+        "lockedUntil": 0
+      },
+      "recovery": {
+        "method": "",
+        "code": "",
+        "expiresAt": 0
+      },
+      "history": []
+    },
+    "E3001": {
+      "employeeId": "E3001",
+      "password": "123456",
+      "profile": {
+        "phone": "19352523648",
+        "email": "lx6597348@gmail.com",
+        "department": "技术部",
+        "position": "开发工程师"
+      },
+      "security": {
+        "failedAttempts": 0,
+        "lockedUntil": 0
+      },
+      "recovery": {
+        "method": "",
+        "code": "",
+        "expiresAt": 0
+      },
+      "history": [
+        {
+          "time": "2026/3/4 21:34:55",
+          "field": "手机号",
+          "oldValue": "-",
+          "newValue": "19352523648"
+        },
+        {
+          "time": "2026/3/4 21:34:55",
+          "field": "邮箱",
+          "oldValue": "-",
+          "newValue": "lx6597348@gmail.com"
+        },
+        {
+          "time": "2026/3/4 21:34:55",
+          "field": "所属部门",
+          "oldValue": "-",
+          "newValue": "技术部"
+        },
+        {
+          "time": "2026/3/4 21:34:55",
+          "field": "岗位",
+          "oldValue": "-",
+          "newValue": "开发工程师"
+        }
+      ]
+    }
+  }
+}

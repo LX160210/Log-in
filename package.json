@@ -1,0 +1,13 @@
+{
+  "name": "front-end-backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "js/server.js",
+  "scripts": {
+    "start": "node js/server.js",
+    "dev": "node js/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
