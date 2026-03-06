@@ -1,210 +1,153 @@
-<div align="center">
+员工信息管理系统
+这是一个完整的员工信息管理 Web 应用，包含前端界面和后端 REST API。
+支持员工注册、登录、密码找回、个人信息维护、修改密码、操作历史记录，以及管理员对员工账号的解锁和密码重置等功能。
 
-# 🏢 员工登录与信息维护系统
+功能特性
+员工端
+注册：新员工使用工号（E + 数字）和密码注册
 
-**Employee Login & Profile Management System**
+登录：工号 + 密码登录，连续 5 次失败账号锁定 5 分钟
 
-一个基于 **Node.js + Express** 的员工账号登录、密码管理与个人信息维护示例项目（前端使用原生 HTML/CSS/JavaScript，数据存储在本地 JSON 文件中）。
+找回密码：通过短信或邮箱验证码重置密码（演示环境直接显示验证码）
 
-![Node.js](https://img.shields.io/badge/Node.js-v12%2B-339933?style=flat-square&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express-4.x-000000?style=flat-square&logo=express&logoColor=white)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![License](https://img.shields.io/badge/License-学习交流-blue?style=flat-square)
+修改密码：登录后可在个人中心修改密码
 
-</div>
+个人信息维护：更新手机、邮箱、部门、岗位，并记录修改历史
 
----
+安全退出：清除本地会话
 
-## 📌 项目亮点
+管理端
+管理员登录：默认账号 admin / Admin123（可环境变量覆盖）
 
-- 🔐 **登录安全策略**：连续输错 **5 次**自动锁定 **5 分钟**
-- 📝 **注册规则校验**：工号 `E`+数字（如 `E1002`），密码 ≥ **6 位**
-- 🔑 **找回密码（演示）**：验证码以弹窗展示（不真实发送短信/邮件）
-- 👤 **个人信息维护**：手机号、邮箱、部门、岗位等信息可修改
-- 📋 **变更历史记录**：默认展示最近 **50 条**信息变更
-- 🚪 **安全退出**：清理本地会话/状态后返回登录页
-- 🛡️ **管理员控制台**：管理员可查看员工列表、解锁被锁定账号、重置员工密码
+管理员注册：新管理员可自行注册（账号格式 A + 数字）
 
-> 适合作为：课程作业、Express 入门练习、简单账号体系 Demo。
+员工管理：
 
----
+查看所有员工列表（工号、部门、岗位、登录状态、失败次数）
 
-## 🖼️ 页面预览
+解除员工账号锁定
 
-![项目首页预览](img/github首页.png)
+重置员工密码（需在界面输入新密码）
 
----
+其他页面
+首页、介绍页、关于页、联系页（联系页可提交留言，后端模拟处理）
 
-## 📑 目录
+技术栈
+前端：HTML5、CSS3、原生 JavaScript（无框架）
 
-- [项目简介](#-项目简介)
-- [功能特性](#-功能特性)
-- [技术栈](#-技术栈)
-- [项目结构](#-项目结构)
-- [安装与运行](#-安装与运行)
-- [使用说明](#-使用说明)
-- [演示账号](#-演示账号)
-- [注意事项](#-注意事项)
-- [自定义与扩展](#-自定义与扩展)
-- [许可](#-许可)
+后端：Node.js + Express
 
----
+数据存储：JSON 文件（data/db.json）
 
-## 📖 项目简介
+运行环境：Node.js (v14+)
 
-前端采用原生 **HTML / CSS / JavaScript (ES6)**，后端使用 **Node.js + Express**，数据存储在本地 JSON 文件 `data/db.json` 中。
+项目结构
+text
+project-root/
+├── html/                   # 前端页面
+│   ├── index.html          # 员工端首页
+│   ├── admin.html          # 管理端
+│   ├── intro.html          # 介绍页
+│   ├── about.html          # 关于页
+│   └── contact.html        # 联系页
+├── css/
+│   └── style.css           # 全局样式
+├── js/
+│   ├── employee.js         # 员工端逻辑
+│   ├── admin.js            # 管理端逻辑
+│   ├── contact.js          # 联系页逻辑
+│   └── server.js           # 后端服务入口
+├── data/
+│   └── db.json             # 数据文件（员工、管理员）
+├── package.json
+├── package-lock.json
+├── start-app.bat           # Windows 一键启动脚本
+└── README.md               # 本文档
+安装与运行
+环境要求
+Node.js (v14 或更高版本)
 
-系统支持：员工注册、登录、找回密码（验证码演示）、修改密码、个人信息维护，并记录每一次信息修改的历史。
+npm (通常随 Node.js 一起安装)
 
----
+方式一：使用启动脚本（Windows）
+双击项目根目录下的 start-app.bat 文件，脚本会自动：
 
-## ✨ 功能特性
+检查 npm 是否可用
 
-| 功能 | 描述 |
-|------|------|
-| 🔐 **员工登录** | 工号 + 密码登录；连续输错 **5 次**后锁定 **5 分钟** |
-| 📝 **员工注册** | 工号格式：`E` + 数字（如 `E1002`）；密码至少 **6 位** |
-| 🔑 **找回密码** | 通过短信或邮箱发送验证码（演示环境弹窗显示），验证后可重置密码 |
-| 🔒 **修改密码** | 登录后在个人中心修改密码 |
-| 👤 **信息维护** | 修改手机号、邮箱、部门、岗位等信息；每次修改均被记录 |
-| 📋 **历史记录** | 展示最近 **50 条**信息变更记录 |
-| 🚪 **安全退出** | 清除本地会话，安全返回登录页 |
-| 🛡️ **管理员登录** | 管理员账号登录管理台，会话有效期 **2 小时** |
-| 👥 **员工管理** | 管理员可查看员工列表、解锁被锁定账号、重置员工密码 |
+检查依赖，若 node_modules 不存在则自动运行 npm install
 
----
+检查端口 3000 是否已被占用
 
-## 🛠 技术栈
+若服务未运行，则新开命令行窗口启动服务
 
-| 分类 | 技术 |
-|------|------|
-| **前端** | HTML5, CSS3, JavaScript (ES6) |
-| **后端** | Node.js, Express |
-| **数据存储** | JSON 文件（`data/db.json`） |
-| **状态管理** | localStorage 维持登录状态 |
+自动打开浏览器访问 http://localhost:3000/html/index.html
 
----
+如需局域网内其他设备访问，请使用本机的内网 IP（如 http://192.168.x.x:3000/html/index.html）
 
-## 📁 项目结构
+方式二：手动启动
+在项目根目录下执行：
 
-```
-项目根目录/
-├── html/                        # 前端页面
-│   ├── index.html               # 首页（登录 / 注册 / 个人中心）
-│   ├── admin.html               # 管理员控制台（登录 / 员工管理）
-│   ├── selfintroduction.html    # 个人介绍页
-│   ├── about.html               # 关于我们
-│   └── contact.html             # 联系页面
-├── css/                         # 样式文件
-│   ├���─ style.css                # 全局样式
-│   └── sistyle.css              # 个人介绍页专用样式
-├── js/                          # JavaScript 脚本
-│   ├── employee.js              # 员工模块逻辑（登录 / 注册 / 个人中心）
-│   ├── admin.js                 # 管理端页面逻辑（登录 / 员工管理）
-│   ├── contact.js               # 联系页面留言处理
-│   └── server.js                # Node.js 后端服务入口
-├── data/                        # 数据存储
-│   └── db.json                  # 员工数据（账号、密码、个人信息、历史）
-├── img/                         # 图片资源
-│   └── github首页.png           # 示例图片
-├── package.json                 # npm 配置及依赖
-├── package-lock.json            # 依赖版本锁定
-└── start-app.bat                # Windows 一键启动脚本
-```
+bash
+npm install      # 安装依赖
+npm start        # 启动服务（或 npm run dev）
+服务启动后，打开浏览器访问 http://localhost:3000/html/index.html 即可。
 
----
+默认账号
+员工账号
+工号：E1001
 
-## 🚀 安装与运行
+密码：Abc12345
 
-### 环境要求
+管理员账号
+账号：admin
 
-- **Node.js** v12 或更高版本
+密码：Admin123
 
-### ⚡ 快速启动（Windows）
+管理员密码可通过环境变量 ADMIN_PASSWORD 覆盖；
+账号 admin 不可被注册，但可以通过管理端注册其他管理员（格式 A + 数字）。
 
-双击 `start-app.bat`，脚本将自动：
+API 接口概览
+所有 API 路径均以 /api 开头，返回 JSON 格式。
 
-1. 检查 npm 环境
-2. 安装项目依赖
-3. 启动后端服务
-4. 自动打开 `http://localhost:3000`
+方法	路径	说明
+POST	/api/auth/login	员工登录
+POST	/api/auth/register	员工注册
+POST	/api/auth/send-code	发送找回密码验证码
+POST	/api/auth/reset-password	重置密码
+POST	/api/auth/change-password	修改密码（需登录状态）
+GET	/api/employees/:id/profile	获取员工个人信息及历史
+PUT	/api/employees/:id/profile	更新员工个人信息
+POST	/api/admin/login	管理员登录
+POST	/api/admin/register	管理员注册
+GET	/api/admin/employees	获取所有员工列表（需管理员 token）
+POST	/api/admin/employees/:id/unlock	解除员工锁定
+POST	/api/admin/employees/:id/reset-password	重置员工密码
+POST	/api/contact	提交留言（模拟）
+管理员接口需要在请求头中携带 Authorization: Bearer <token>，token 由登录接口返回。
 
-### 🖥 手动启动
+注意事项
+密码规则：所有密码必须同时包含字母和数字，且只能包含字母和数字，长度至少 8 位。
 
-```bash
-# 进入项目根目录
-cd your-project-folder
+验证码演示：在找回密码流程中，由于未集成真实短信/邮件网关，后端会直接返回验证码并在前端通过 alert 显示，方便测试。
 
-# 安装依赖
-npm install
+数据持久化：所有数据均保存在 data/db.json 文件中，重启服务数据不会丢失。
 
-# 启动服务
-npm start
-# 服务默认运行在 http://localhost:3000
-```
+会话管理：
 
-### 🌐 局域网访问
+员工端使用 localStorage 存储工号作为登录凭证（简单模拟，实际生产应使用 token）。
 
-服务默认监听 `0.0.0.0`，同一局域网内的设备可通过以下地址访问：
+管理端使用内存 Map 存储会话 token，服务重启后所有管理员需重新登录。
 
-```
-http://你的内网IP:3000
-```
+端口占用：默认使用 3000 端口，如需修改，请更改 server.js 中的 PORT 变量。
 
----
+扩展与自定义
+管理员默认密码：可通过环境变量 ADMIN_PASSWORD 修改。
 
-## 📘 使用说明
+锁定阈值与时长：可在 server.js 顶部调整 LOCK_THRESHOLD 和 LOCK_DURATION_MS。
 
-1. **登录**：使用演示账号或自行注册账号后登录。
-2. **注册**：工号格式为 `E` + 数字（如 `E2002`），密码至少 6 位。
-3. **找回密码**：点击“忘记密码”，输入工号并选择验证方式；点击“发送验证码”后会弹窗显示验证码，输入后即可重置密码。
-4. **个人中心**：登录后可修改密码、更新个人信息；变更历史在页面下方表格展示。
-5. **退出**：点击“安全退出”清除登录状态。
-6. **管理员**：访问 `html/admin.html`，使用管理员账号登录后可查看员工列表、解锁被锁定账号、重置员工密码。还可在管理台注册新管理员（账号格式为 `A` + 数字，如 `A1001`；密码至少 **8 位**，且必须同时包含字母和数字）。
+验证码有效期：修改 CODE_EXPIRE_MS。
 
----
+前端样式：所有样式集中在 css/style.css，可自由调整。
 
-## 👤 演示账号
-
-为避免 README 与数据文件不一致，演示账号请以 `data/db.json` 为准。当前仓库内置员工演示账号如下：
-
-| 工号 | 密码 | 备注 |
-|------|------|------|
-| `E1001` | `Abc12345` | 内置员工账号 1（以 `data/db.json` 实际值为准） |
-| `E1002` | `Abc12345` | 内置员工账号 2（以 `data/db.json` 实际值为准） |
-
-管理员默认账号如下（可通过环境变量 `ADMIN_USERNAME` / `ADMIN_PASSWORD` 覆盖）：
-
-| 账号 | 密码 | 备注 |
-|------|------|------|
-| `admin` | `Admin123` | 默认管理员账号 |
-
-> 💡 该项目后端在处理请求时会读取 `data/db.json`；因此你手动修改账号/密码后，通常无需重启服务即可生效。
-
----
-
-## ⚠️ 注意事项
-
-- 验证码为**演示功能**：不会真实发送短信/邮件，而是通过 `alert` 弹出。
-- 连续输错密码 **5 次**后锁定 **5 分钟**（重启服务会重置计数）。
-- 所有数据保存在 `data/db.json` 中。
-
----
-
-## 🔧 自定义与扩展
-
-- 在 `server.js` 中可调整锁定策略：
-  - `LOCK_THRESHOLD`：最大错误次数（默认 5）
-  - `LOCK_DURATION_MS`：锁定时长（毫秒，默认 5 分钟）
-- 通过环境变量可覆盖默认管理员账号：
-  - `ADMIN_USERNAME`：管理员账号（默认 `admin`）
-  - `ADMIN_PASSWORD`：管理员密码（默认 `Admin123`）
-- 若需要接入真实数据库：替换 `loadDB` / `saveDB` 的实现逻辑即可（例如 MySQL / PostgreSQL / MongoDB）。
-
----
-
-## 📄 许可
-
-本项目仅供**学习交流**使用，无任何商业授权限制。
+开发与贡献
+本项目为教学/演示用途，欢迎 Fork 和修改。如有问题或建议，请在 GitHub 仓库提交 Issue。
