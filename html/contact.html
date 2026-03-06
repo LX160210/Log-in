@@ -11,19 +11,21 @@
     <header>
         <nav>
             <ul>
-                <li><a href="index.html">首页</a></li>
-                <li><a href="selfintroduction.html">介绍</a></li>
-                <li><a href="about.html">关于</a></li>
-                <li><a href="contact.html">联系</a></li>
+                <li><a href="./index.html">首页</a></li>
+                <li><a href="./intro.html">介绍</a></li>
+                <li><a href="./about.html">关于</a></li>
+                <li><a href="./contact.html">联系</a></li>
+                <li><a href="./admin.html">管理端</a></li>
             </ul>
         </nav>
     </header>
     <main>
         <h1>联系我们</h1>
-        <p>这里是联系页面，可以放联系方式。</p>
+        <p class="contactSuggest">这里是联系页面，可以放联系方式。</p>
         <form id="contactForm">
-            留言: <textarea id="contactMessage" placeholder="请输入评论" required></textarea>
-            <br>
+            <label class="contactMessage" for="contactMessage">留言:</label>
+            <textarea id="contactMessage" placeholder="请输入评论" required
+                style="width: 400px; height: 100px;"></textarea><br>
             <button type="submit">提交留言</button>
         </form>
         <p id="contactFeedback"></p>
