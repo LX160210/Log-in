@@ -1,2 +1,150 @@
-<h1>Login</h1>
-<p>演示账号请以 data/db.json 为准（如 E1001 / Abc12345，E1002 / Abc12345）</p>
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="./index.html">首页</a></li>
+                <li><a href="./intro.html">介绍</a></li>
+                <li><a href="./about.html">关于</a></li>
+                <li><a href="./contact.html">联系</a></li>
+                <li><a href="./admin.html">管理端</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>员工账号登录与信息维护</h1>
+        <p>支持工号密码登录、找回密码、密码修改、安全退出及个人信息维护。</p>
+
+        <section id="authCard" class="panel">
+            <h2>员工登录</h2>
+            <form id="loginForm" class="form-grid">
+                <label for="employeeId">工号</label>
+                <input id="employeeId" type="text" placeholder="例如：E1001" required>
+
+                <label for="loginPassword">密码</label>
+                <input id="loginPassword" type="password" placeholder="请输入密码"
+                    pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="必须同时包含字母和数字，且只能包含字母和数字" required>
+
+                <button type="submit">登录</button>
+            </form>
+            <div class="inline-actions">
+                <button id="showForgotBtn" type="button">忘记密码</button>
+                <button id="showRegister" type="button">注册新账号</button>
+            </div>
+            <p id="authMessage" class="message"></p>
+            <p class="hint">演示默认账号：工号 E1001，密码 Abc12345</p>
+        </section>
+
+        <section id="registerCard" class="panel hidden">
+            <h2>用户注册</h2>
+            <form id="registerForm" class="form-grid">
+                <label for="registerEmployeeId">工号</label>
+                <input id="registerEmployeeId" type="text" placeholder="请输入工号，如 E1002" required>
+
+                <label for="registerPassword">密码</label>
+                <input id="registerPassword" type="password" placeholder="请输入密码（至少8位）" minlength="8"
+                    pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="必须同时包含字母和数字，且只能包含字母和数字" required>
+                <button type="submit">注册</button><button id="cancelRegister" type="button">取消</button>
+            </form>
+            <p id="registerMessage" class="message"></p>
+        </section>
+
+        <section id="forgotCard" class="panel hidden">
+            <h2>找回密码</h2>
+            <form id="forgotForm" class="form-grid">
+                <label for="recoverEmployeeId">工号</label>
+                <input id="recoverEmployeeId" type="text" placeholder="请输入找回账号的工号" required>
+
+                <label>验证方式</label>
+                <div class="inline-actions">
+                    <label><input type="radio" name="recoverMethod" value="sms" checked> 短信</label>
+                    <label><input type="radio" name="recoverMethod" value="email"> 邮箱</label>
+                </div>
+
+                <button id="sendCodeBtn" type="button">发送验证码</button><br>
+
+                <label for="verifyCode">验证码
+                </label><input id="verifyCode" type="text" placeholder="请输入收到的验证码" required>
+
+
+                <label for="newPassword">新密码</label>
+                <input id="newPassword" type="password" placeholder="请输入新密码（至少8位）" minlength="8"
+                    pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="必须同时包含字母和数字，且只能包含字母和数字" required>
+
+                <button type="submit">重置密码</button>
+            </form>
+            <div class="inline-actions">
+                <button id="backToLoginBtn" type="button">返回登录</button>
+            </div>
+            <p id="forgotMessage" class="message"></p>
+        </section>
+
+        <section id="dashboard" class="panel hidden">
+            <div class="dashboard-header">
+                <h2>员工中心</h2>
+                <button id="logoutBtn" type="button">安全退出</button>
+            </div>
+            <p id="welcomeText"></p>
+
+            <h3>修改密码</h3>
+            <form id="changePwdForm" class="form-grid compact">
+                <label for="oldPassword">旧密码</label>
+                <input id="oldPassword" type="password" placeholder="请输入旧密码" pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+"
+                    title="必须同时包含字母和数字，且只能包含字母和数字" required>
+
+                <label for="updatedPassword">新密码</label>
+                <input id="updatedPassword" type="password" placeholder="请输入新密码（至少8位）" minlength="8"
+                    pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="必须同时包含字母和数字，且只能包含字母和数字" required>
+
+                <button type="submit">确认修改</button>
+            </form>
+            <p id="changePwdMessage" class="message"></p>
+
+            <h3>个人信息维护</h3>
+            <form id="profileForm" class="form-grid compact">
+                <label for="phone">手机号</label>
+                <input id="phone" type="tel" required>
+
+                <label for="email">邮箱</label>
+                <input id="email" type="email" required>
+
+                <label for="department">所属部门</label>
+                <input id="department" type="text" required>
+
+                <label for="position">岗位</label>
+                <input id="position" type="text" required>
+
+                <button type="submit">保存信息</button>
+            </form>
+            <p id="profileMessage" class="message"></p>
+
+            <h3>信息修改记录</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>字段</th>
+                        <th>修改前</th>
+                        <th>修改后</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 我的完整网站</p>
+    </footer>
+    <script src="../js/employee.js"></script>
+</body>
+
+</html>
