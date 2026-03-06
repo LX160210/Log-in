@@ -1,4 +1,5 @@
 const express = require("express");
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
@@ -8,10 +9,15 @@ const PORT = process.env.PORT || 3000;
 const LOCK_THRESHOLD = 5;
 const LOCK_DURATION_MS = 5 * 60 * 1000;
 const CODE_EXPIRE_MS = 5 * 60 * 1000;
+const ADMIN_SESSION_MS = 2 * 60 * 60 * 1000;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin123";
+const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
 
 const rootDir = path.join(__dirname, "..");
 const htmlDir = path.join(rootDir, "html");
 const dbPath = path.join(rootDir, "data", "db.json");
+const adminSessions = new Map();
 
 app.use(express.json());
 app.use(express.static(rootDir));
@@ -45,6 +51,64 @@ function formatTime(timestamp) {
   return new Date(timestamp).toLocaleString("zh-CN", { hour12: false });
 }
 
+function createAdminSession(username) {
+  const token = crypto.randomBytes(24).toString("hex");
+  const expiresAt = Date.now() + ADMIN_SESSION_MS;
+  adminSessions.set(token, { username, expiresAt });
+  return { token, expiresAt };
+}
+
+function getAdminToken(req) {
+  const authHeader = String(req.headers.authorization || "");
+  if (authHeader.startsWith("Bearer ")) {
+    return authHeader.slice(7).trim();
+  }
+  return String(req.headers["x-admin-token"] || "").trim();
+}
+
+function requireAdmin(req, res) {
+  const token = getAdminToken(req);
+  if (!token) {
+    res.status(401).json({ message: "管理员未登录或登录已失效。" });
+    return false;
+  }
+
+  const session = adminSessions.get(token);
+  if (!session || Date.now() > session.expiresAt) {
+    adminSessions.delete(token);
+    res.status(401).json({ message: "管理员会话已过期，请重新登录。" });
+    return false;
+  }
+
+  req.adminUser = session.username;
+
+  return true;
+}
+
+function ensureAdminStore(db) {
+  if (!db.admins || typeof db.admins !== "object") {
+    db.admins = {};
+  }
+}
+
+function getStoredAdmin(db, username) {
+  ensureAdminStore(db);
+  return db.admins[username];
+}
+
+function getEmployeeSummary(employee) {
+  const locked = Boolean(employee.security && employee.security.lockedUntil && Date.now() < employee.security.lockedUntil);
+  return {
+    employeeId: employee.employeeId,
+    profile: employee.profile || {},
+    security: {
+      failedAttempts: employee.security ? employee.security.failedAttempts || 0 : 0,
+      lockedUntil: employee.security ? employee.security.lockedUntil || 0 : 0,
+      locked
+    }
+  };
+}
+
 app.post("/api/auth/login", (req, res) => {
   const employeeId = String(req.body.employeeId || "").trim().toUpperCase();
   const password = String(req.body.password || "");
@@ -54,6 +118,10 @@ app.post("/api/auth/login", (req, res) => {
 
   if (!employee) {
     return res.status(404).json({ message: "工号不存在。" });
+  }
+
+  if (!PASSWORD_RULE.test(password)) {
+    return res.status(400).json({ message: "密码格式不正确，必须同时包含字母和数字，且只能包含字母和数字。" });
   }
 
   if (isLocked(employee)) {
@@ -136,8 +204,16 @@ app.post("/api/auth/reset-password", (req, res) => {
     return res.status(400).json({ message: "验证码错误。" });
   }
 
-  if (newPassword.length < 6) {
-    return res.status(400).json({ message: "新密码长度至少 6 位。" });
+  if (newPassword.length < 8) {
+    return res.status(400).json({ message: "新密码长度至少 8 位。" });
+  }
+
+  if (!PASSWORD_RULE.test(newPassword)) {
+    return res.status(400).json({ message: "新密码必须同时包含字母和数字，且只能包含字母和数字。" });
+  }
+
+  if (!PASSWORD_RULE.test(newPassword)) {
+    return res.status(400).json({ message: "新密码必须同时包含字母和数字，且只能包含字母和数字。" });
   }
 
   employee.password = newPassword;
@@ -165,8 +241,16 @@ app.post("/api/auth/change-password", (req, res) => {
     return res.status(400).json({ message: "旧密码不正确。" });
   }
 
-  if (newPassword.length < 6) {
-    return res.status(400).json({ message: "新密码长度至少 6 位。" });
+  if (!PASSWORD_RULE.test(oldPassword)) {
+    return res.status(400).json({ message: "旧密码格式不正确，必须同时包含字母和数字，且只能包含字母和数字。" });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ message: "新密码长度至少 8 位。" });
+  }
+
+  if (!PASSWORD_RULE.test(newPassword)) {
+    return res.status(400).json({ message: "新密码必须同时包含字母和数字，且只能包含字母和数字。" });
   }
 
   if (newPassword === oldPassword) {
@@ -248,8 +332,12 @@ app.post("/api/auth/register", (req, res) => {
     return res.status(400).json({ message: "工号格式不正确，应为 E+数字（如 E1002）。" });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({ message: "密码至少 6 位。" });
+  if (password.length < 8) {
+    return res.status(400).json({ message: "密码至少 8 位。" });
+  }
+
+  if (!PASSWORD_RULE.test(password)) {
+    return res.status(400).json({ message: "密码必须同时包含字母和数字，且只能包含字母和数字。" });
   }
 
   const db = loadDB();
@@ -280,6 +368,132 @@ app.post("/api/auth/register", (req, res) => {
 
   saveDB(db);
   return res.json({ message: "注册成功，请返回登录。" });
+});
+
+app.post("/api/admin/login", (req, res) => {
+  const username = String(req.body.username || "").trim();
+  const password = String(req.body.password || "");
+
+  const db = loadDB();
+  if (!PASSWORD_RULE.test(password)) {
+    return res.status(400).json({ message: "密码格式不正确，必须同时包含字母和数字，且只能包含字母和数字。" });
+  }
+
+  const storedAdmin = getStoredAdmin(db, username);
+  const matchedDefault = username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
+  const matchedStored = Boolean(storedAdmin && storedAdmin.password === password);
+
+  if (!matchedDefault && !matchedStored) {
+    return res.status(401).json({ message: "管理员账号或密码错误。" });
+  }
+
+  const session = createAdminSession(username);
+  return res.json({
+    message: "管理员登录成功。",
+    token: session.token,
+    expiresAt: session.expiresAt
+  });
+});
+
+app.post("/api/admin/register", (req, res) => {
+  const username = String(req.body.username || "").trim().toUpperCase();
+  const password = String(req.body.password || "");
+
+  if (!/^A\d{4,}$/.test(username)) {
+    return res.status(400).json({ message: "管理员账号格式不正确，应为 A+数字（如 A1001）。" });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ message: "管理员密码至少 8 位。" });
+  }
+
+  if (!PASSWORD_RULE.test(password)) {
+    return res.status(400).json({ message: "管理员密码必须同时包含字母和数字，且只能包含字母和数字。" });
+  }
+
+  if (username === ADMIN_USERNAME) {
+    return res.status(409).json({ message: "该管理员账号已保留，请使用其他账号。" });
+  }
+
+  const db = loadDB();
+  ensureAdminStore(db);
+  if (db.admins[username]) {
+    return res.status(409).json({ message: "管理员账号已存在。" });
+  }
+
+  db.admins[username] = {
+    username,
+    password,
+    createdAt: Date.now()
+  };
+  saveDB(db);
+
+  return res.json({ message: "管理员注册成功，请登录管理端。" });
+});
+
+app.get("/api/admin/employees", (req, res) => {
+  if (!requireAdmin(req, res)) {
+    return;
+  }
+
+  const db = loadDB();
+  const employees = Object.keys(db.employees)
+    .sort()
+    .map((employeeId) => getEmployeeSummary(db.employees[employeeId]));
+
+  return res.json({ employees });
+});
+
+app.post("/api/admin/employees/:id/unlock", (req, res) => {
+  if (!requireAdmin(req, res)) {
+    return;
+  }
+
+  const employeeId = String(req.params.id || "").trim().toUpperCase();
+  const db = loadDB();
+  const employee = getEmployee(db, employeeId);
+
+  if (!employee) {
+    return res.status(404).json({ message: "工号不存在。" });
+  }
+
+  employee.security.failedAttempts = 0;
+  employee.security.lockedUntil = 0;
+  saveDB(db);
+
+  return res.json({
+    message: `工号 ${employeeId} 已解除锁定。`,
+    employee: getEmployeeSummary(employee)
+  });
+});
+
+app.post("/api/admin/employees/:id/reset-password", (req, res) => {
+  if (!requireAdmin(req, res)) {
+    return;
+  }
+
+  const employeeId = String(req.params.id || "").trim().toUpperCase();
+  const newPassword = String(req.body.newPassword || "");
+  const db = loadDB();
+  const employee = getEmployee(db, employeeId);
+
+  if (!employee) {
+    return res.status(404).json({ message: "工号不存在。" });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ message: "新密码长度至少 8 位。" });
+  }
+
+  employee.password = newPassword;
+  employee.security.failedAttempts = 0;
+  employee.security.lockedUntil = 0;
+  saveDB(db);
+
+  return res.json({
+    message: `工号 ${employeeId} 密码已重置。`,
+    employee: getEmployeeSummary(employee)
+  });
 });
 
 app.post("/api/contact", (req, res) => {
